@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,11 @@ import { Home, Menu, Users, CreditCard, ClipboardList, Table, LogOut, Settings }
 
 const Layout = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const location = useLocation();
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    // Redirect to login but remember where the user was trying to go
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   const sidebarItems = [
