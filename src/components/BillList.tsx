@@ -130,4 +130,3 @@ const BillList = ({ bills }: BillListProps) => {
 };
 
 export default BillList;
-

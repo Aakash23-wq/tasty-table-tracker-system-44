@@ -58,18 +58,18 @@ export function useBillingProvider(
       )
     );
     
-    toast({
-      title: "Payment status updated",
-      description: `Payment marked as ${status}`,
-    });
+    // Get the bill and corresponding order
+    const bill = bills.find(b => b.id === billId);
     
-    // If payment is completed, free up the table
-    if (status === "completed") {
-      const bill = bills.find(b => b.id === billId);
-      if (bill) {
+    if (bill) {
+      toast({
+        title: "Payment status updated",
+        description: `Payment for bill #${bill.id.slice(-3)} marked as ${status}`,
+      });
+      
+      // If payment is completed, free up the table and mark order as completed
+      if (status === "completed") {
         updateTableStatus(bill.tableId, "available");
-        
-        // Update the order status
         updateOrderStatus(bill.orderId, "completed");
       }
     }
@@ -81,4 +81,3 @@ export function useBillingProvider(
     updateBillPaymentStatus
   };
 }
-
