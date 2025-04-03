@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useRestaurant } from '@/contexts/RestaurantContext';
+import { IndianRupee } from 'lucide-react';
 
 interface BillListProps {
   bills: Bill[];
@@ -64,11 +65,11 @@ const BillList = ({ bills }: BillListProps) => {
                       <div>
                         <div>{item.name}</div>
                         <div className="text-sm text-gray-500">
-                          ${item.price.toFixed(2)} x {item.quantity}
+                          ₹{item.price.toFixed(2)} x {item.quantity}
                         </div>
                       </div>
                       <div className="font-semibold">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        ₹{(item.price * item.quantity).toFixed(2)}
                       </div>
                     </li>
                   ))}
@@ -77,21 +78,21 @@ const BillList = ({ bills }: BillListProps) => {
                 <div className="space-y-1 pt-2">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Subtotal:</span>
-                    <span>${bill.subtotal.toFixed(2)}</span>
+                    <span>₹{bill.subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Tax:</span>
-                    <span>${bill.tax.toFixed(2)}</span>
+                    <span>₹{bill.tax.toFixed(2)}</span>
                   </div>
                   {bill.discount && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">Discount:</span>
-                      <span>-${bill.discount.toFixed(2)}</span>
+                      <span>-₹{bill.discount.toFixed(2)}</span>
                     </div>
                   )}
                   <div className="flex justify-between pt-2 text-lg font-semibold">
                     <span>Total:</span>
-                    <span>${bill.total.toFixed(2)}</span>
+                    <span>₹{bill.total.toFixed(2)}</span>
                   </div>
                 </div>
                 
@@ -129,3 +130,4 @@ const BillList = ({ bills }: BillListProps) => {
 };
 
 export default BillList;
+

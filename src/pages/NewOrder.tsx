@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useRestaurant } from '@/contexts/RestaurantContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { MenuItemCard } from '@/components/MenuItemCard';
 import { MenuItem, OrderItem } from '@/types';
 import { toast } from 'sonner';
+import { IndianRupee } from 'lucide-react';
 
 const NewOrder = () => {
   const { tables, menuItems, customers, addCustomer, createOrder, updateTableStatus } = useRestaurant();
@@ -26,16 +26,12 @@ const NewOrder = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [cartItems, setCartItems] = useState<Array<OrderItem>>([]);
   
-  // Get available tables
   const availableTables = tables.filter(table => table.status === 'available');
   
-  // Get available menu items
   const availableMenuItems = menuItems.filter(item => item.isAvailable);
   
-  // Get unique categories
   const categories = Array.from(new Set(menuItems.map(item => item.category)));
   
-  // Filter menu items based on search and category
   const filteredItems = availableMenuItems.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
@@ -43,24 +39,20 @@ const NewOrder = () => {
     return matchesSearch && matchesCategory;
   });
   
-  // Calculate total
   const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   const tax = subtotal * 0.1; // 10% tax
   const total = subtotal + tax;
   
-  // Handle adding item to cart
   const handleAddToCart = (menuItem: MenuItem) => {
     const existingItem = cartItems.find(item => item.menuItemId === menuItem.id);
     
     if (existingItem) {
-      // Increase quantity if item already in cart
       setCartItems(cartItems.map(item => 
         item.menuItemId === menuItem.id 
           ? { ...item, quantity: item.quantity + 1 } 
           : item
       ));
     } else {
-      // Add new item to cart
       const newCartItem: OrderItem = {
         id: `temp-${Date.now()}`,
         menuItemId: menuItem.id,
@@ -75,12 +67,10 @@ const NewOrder = () => {
     toast.success(`Added ${menuItem.name} to order`);
   };
   
-  // Handle removing item from cart
   const handleRemoveFromCart = (itemId: string) => {
     setCartItems(cartItems.filter(item => item.id !== itemId));
   };
   
-  // Handle updating item quantity
   const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
     
@@ -91,7 +81,6 @@ const NewOrder = () => {
     ));
   };
   
-  // Handle creating new customer
   const handleCreateCustomer = () => {
     if (!customerName) {
       toast.error('Customer name is required');
@@ -107,7 +96,6 @@ const NewOrder = () => {
     toast.success(`Added ${newCustomer.name} as a new customer`);
   };
   
-  // Handle placing order
   const handlePlaceOrder = () => {
     if (!selectedTableId) {
       toast.error('Please select a table');
@@ -124,7 +112,6 @@ const NewOrder = () => {
       return;
     }
     
-    // Create the order
     const newOrder = createOrder({
       tableId: selectedTableId,
       customerId: selectedCustomerId || undefined,
@@ -133,16 +120,13 @@ const NewOrder = () => {
       status: 'active'
     });
     
-    // Update table status
     updateTableStatus(selectedTableId, 'occupied', selectedCustomerId || undefined, user.id);
     
-    // Navigate to the orders page
     navigate(`/orders?tableId=${selectedTableId}`);
     
     toast.success('Order placed successfully');
   };
   
-  // Reset form if table is changed
   useEffect(() => {
     setCartItems([]);
     setSelectedCustomerId('');
@@ -300,7 +284,9 @@ const NewOrder = () => {
                         <li key={item.id} className="flex justify-between pb-2 border-b">
                           <div>
                             <div className="font-medium">{item.name}</div>
-                            <div className="text-sm text-gray-500">${item.price.toFixed(2)} each</div>
+                            <div className="text-sm text-gray-500 flex items-center">
+                              <IndianRupee className="h-3 w-3 mr-1" />{item.price.toFixed(2)} each
+                            </div>
                             <div className="flex items-center mt-1">
                               <Button 
                                 size="sm" 
@@ -329,8 +315,9 @@ const NewOrder = () => {
                               </Button>
                             </div>
                           </div>
-                          <div className="font-semibold">
-                            ${(item.price * item.quantity).toFixed(2)}
+                          <div className="font-semibold flex items-center">
+                            <IndianRupee className="h-3 w-3 mr-1" />
+                            {(item.price * item.quantity).toFixed(2)}
                           </div>
                         </li>
                       ))}
@@ -339,15 +326,21 @@ const NewOrder = () => {
                     <div className="space-y-1 pt-2">
                       <div className="flex justify-between">
                         <span className="text-gray-600">Subtotal:</span>
-                        <span>${subtotal.toFixed(2)}</span>
+                        <span className="flex items-center">
+                          <IndianRupee className="h-3 w-3 mr-1" />{subtotal.toFixed(2)}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Tax (10%):</span>
-                        <span>${tax.toFixed(2)}</span>
+                        <span className="flex items-center">
+                          <IndianRupee className="h-3 w-3 mr-1" />{tax.toFixed(2)}
+                        </span>
                       </div>
                       <div className="flex justify-between pt-2 text-lg font-semibold">
                         <span>Total:</span>
-                        <span>${total.toFixed(2)}</span>
+                        <span className="flex items-center">
+                          <IndianRupee className="h-4 w-4 mr-1" />{total.toFixed(2)}
+                        </span>
                       </div>
                     </div>
                   </>

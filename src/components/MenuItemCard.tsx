@@ -72,3 +72,4 @@ export const MenuItemCard = ({ item, onSelect, selectable = false }: MenuItemCar
     </Card>
   );
 };
+

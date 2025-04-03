@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useRestaurant } from '@/contexts/RestaurantContext';
+import { IndianRupee } from 'lucide-react';
 
 interface OrderListProps {
   orders: Order[];
@@ -84,11 +85,11 @@ const OrderList = ({ orders, showTableInfo = true }: OrderListProps) => {
                           </Badge>
                         </div>
                         <div className="text-sm text-gray-500">
-                          ${item.price.toFixed(2)} x {item.quantity}
+                          ₹{item.price.toFixed(2)} x {item.quantity}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-semibold">${(item.price * item.quantity).toFixed(2)}</div>
+                        <div className="font-semibold">₹{(item.price * item.quantity).toFixed(2)}</div>
                         <div className="flex gap-1 mt-1">
                           {order.status === 'active' && (
                             <>
@@ -133,7 +134,7 @@ const OrderList = ({ orders, showTableInfo = true }: OrderListProps) => {
                 <div className="flex justify-between pt-2 font-semibold">
                   <span>Total:</span>
                   <span>
-                    ${order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}
+                    ₹{order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}
                   </span>
                 </div>
                 
@@ -157,3 +158,4 @@ const OrderList = ({ orders, showTableInfo = true }: OrderListProps) => {
 };
 
 export default OrderList;
+

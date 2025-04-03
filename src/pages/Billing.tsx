@@ -5,6 +5,7 @@ import BillList from '@/components/BillList';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { IndianRupee } from 'lucide-react';
 
 const Billing = () => {
   const { bills, tables } = useRestaurant();
@@ -44,7 +45,10 @@ const Billing = () => {
             <CardTitle className="text-sm text-gray-500">Total Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
+            <div className="text-2xl font-bold flex items-center">
+              <IndianRupee className="h-5 w-5 mr-1" />
+              {totalRevenue.toFixed(2)}
+            </div>
             <p className="text-xs text-gray-500 mt-1">From completed payments</p>
           </CardContent>
         </Card>
@@ -109,3 +113,4 @@ const Billing = () => {
 };
 
 export default Billing;
+
