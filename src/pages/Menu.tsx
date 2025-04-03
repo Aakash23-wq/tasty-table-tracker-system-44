@@ -5,12 +5,32 @@ import { MenuItemCard } from '@/components/MenuItemCard';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { toast } from 'sonner';
 
 const Menu = () => {
-  const { menuItems } = useRestaurant();
+  const { menuItems, addMenuItem } = useRestaurant();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [availabilityFilter, setAvailabilityFilter] = useState<string>('all');
+  
+  // New state for the add menu item form
+  const [newMenuItem, setNewMenuItem] = useState({
+    name: '',
+    description: '',
+    price: 0,
+    category: '',
+    isAvailable: true,
+    cuisine: '',
+    veg: false
+  });
 
   // Get unique categories
   const categories = Array.from(new Set(menuItems.map(item => item.category)));
@@ -31,13 +51,165 @@ const Menu = () => {
   const availableCount = menuItems.filter(item => item.isAvailable).length;
   const unavailableCount = menuItems.filter(item => !item.isAvailable).length;
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setNewMenuItem({
+      ...newMenuItem,
+      [name]: name === 'price' ? parseFloat(value) || 0 : value
+    });
+  };
+
+  const handleSwitchChange = (name: string, checked: boolean) => {
+    setNewMenuItem({
+      ...newMenuItem,
+      [name]: checked
+    });
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setNewMenuItem({
+      ...newMenuItem,
+      [name]: value
+    });
+  };
+
+  const handleAddMenuItem = () => {
+    // Validate form
+    if (!newMenuItem.name || !newMenuItem.description || newMenuItem.price <= 0 || !newMenuItem.category || !newMenuItem.cuisine) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+
+    // Add the menu item
+    addMenuItem(newMenuItem);
+    
+    // Reset form
+    setNewMenuItem({
+      name: '',
+      description: '',
+      price: 0,
+      category: '',
+      isAvailable: true,
+      cuisine: '',
+      veg: false
+    });
+  };
+
+  const isAdmin = user?.role === 'admin';
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Menu Management</h2>
-        <p className="text-gray-500">
-          Manage menu items and their availability status
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold">Menu Management</h2>
+          <p className="text-gray-500">
+            Manage menu items and their availability status
+          </p>
+        </div>
+        
+        {isAdmin && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="flex items-center gap-2">
+                <PlusCircle className="h-4 w-4" />
+                Add New Item
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[550px]">
+              <DialogHeader>
+                <DialogTitle>Add New Menu Item</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Item Name*</Label>
+                    <Input 
+                      id="name" 
+                      name="name" 
+                      value={newMenuItem.name} 
+                      onChange={handleInputChange} 
+                      placeholder="e.g. Butter Chicken"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="price">Price (₹)*</Label>
+                    <Input 
+                      id="price" 
+                      name="price" 
+                      type="number" 
+                      value={newMenuItem.price || ''} 
+                      onChange={handleInputChange} 
+                      placeholder="e.g. 299.99"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description*</Label>
+                  <Textarea 
+                    id="description" 
+                    name="description" 
+                    value={newMenuItem.description} 
+                    onChange={handleInputChange} 
+                    placeholder="Describe the dish..."
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="category">Category*</Label>
+                    <Select 
+                      value={newMenuItem.category} 
+                      onValueChange={(value) => handleSelectChange('category', value)}
+                    >
+                      <SelectTrigger id="category">
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map(category => (
+                          <SelectItem key={category} value={category}>{category}</SelectItem>
+                        ))}
+                        <SelectItem value="New Category">+ Add New Category</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cuisine">Cuisine*</Label>
+                    <Input 
+                      id="cuisine" 
+                      name="cuisine" 
+                      value={newMenuItem.cuisine} 
+                      onChange={handleInputChange} 
+                      placeholder="e.g. Indian, Italian, etc."
+                    />
+                  </div>
+                </div>
+                <div className="flex space-x-4 items-center">
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor="isAvailable">Available</Label>
+                    <Switch 
+                      id="isAvailable" 
+                      checked={newMenuItem.isAvailable} 
+                      onCheckedChange={(checked) => handleSwitchChange('isAvailable', checked)} 
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor="veg">Vegetarian</Label>
+                    <Switch 
+                      id="veg" 
+                      checked={newMenuItem.veg} 
+                      onCheckedChange={(checked) => handleSwitchChange('veg', checked)} 
+                    />
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button onClick={handleAddMenuItem}>Add Item</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="flex flex-col md:flex-row gap-4">

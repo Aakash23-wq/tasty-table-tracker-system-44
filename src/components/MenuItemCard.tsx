@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { useRestaurant } from '@/contexts/RestaurantContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { IndianRupee } from 'lucide-react';
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -41,7 +42,10 @@ export const MenuItemCard = ({ item, onSelect, selectable = false }: MenuItemCar
         
         <div className="mt-2">
           <p className="text-sm text-gray-500">{item.category} • {item.cuisine}</p>
-          <p className="text-lg font-semibold mt-1">${item.price.toFixed(2)}</p>
+          <p className="text-lg font-semibold mt-1 flex items-center">
+            <IndianRupee className="h-4 w-4 mr-1" />
+            {item.price.toFixed(2)}
+          </p>
         </div>
         
         <div className="mt-4 flex justify-between items-center">
