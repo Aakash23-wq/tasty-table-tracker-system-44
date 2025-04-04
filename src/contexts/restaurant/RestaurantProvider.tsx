@@ -8,6 +8,7 @@ import { useOrderProvider } from "./OrderContext";
 import { useBillingProvider } from "./BillingContext";
 import { RestaurantContextType } from "./types";
 import { initializeDatabase, useRestaurantDB } from "@/services/DatabaseService";
+import { toast } from "sonner";
 
 const RestaurantContext = createContext<RestaurantContextType | undefined>(undefined);
 
@@ -35,10 +36,16 @@ export function RestaurantProvider({ children }: { children: React.ReactNode }) 
     return <div>Loading restaurant data...</div>;
   }
 
+  // Function to update restaurant information
+  const updateRestaurantInfo = (updatedRestaurant: Restaurant) => {
+    setRestaurant(updatedRestaurant);
+    toast.success("Restaurant information updated successfully");
+  };
+
   // Combine all context values
   const contextValue: RestaurantContextType = {
     restaurant,
-    updateRestaurant: setRestaurant,
+    updateRestaurant: updateRestaurantInfo,
     ...tableContext,
     ...menuContext,
     ...customerContext,

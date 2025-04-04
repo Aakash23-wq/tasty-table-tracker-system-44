@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -19,7 +18,7 @@ const Settings = () => {
   const { restaurant, updateRestaurant } = useRestaurant();
   
   // Restaurant form state
-  const [restaurantForm, setRestaurantForm] = useState({
+  const [restaurantForm, setRestaurantForm = useState({
     name: restaurant.name,
     location: restaurant.location,
     phone: restaurant.phone,
@@ -28,7 +27,7 @@ const Settings = () => {
   });
   
   // Password change form state
-  const [passwordForm, setPasswordForm] = useState({
+  const [passwordForm, setPasswordForm = useState({
     userId: '',
     currentPassword: '',
     newPassword: '',
@@ -36,7 +35,7 @@ const Settings = () => {
   });
   
   // New user form state
-  const [newUserForm, setNewUserForm] = useState({
+  const [newUserForm, setNewUserForm = useState({
     name: '',
     email: '',
     role: 'waiter' as 'admin' | 'waiter',
@@ -44,7 +43,7 @@ const Settings = () => {
   });
   
   // Edit user form state
-  const [editUserForm, setEditUserForm] = useState({
+  const [editUserForm, setEditUserForm = useState({
     id: '',
     name: '',
     email: '',
@@ -52,9 +51,9 @@ const Settings = () => {
   });
   
   // Dialog states
-  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
-  const [isNewUserDialogOpen, setIsNewUserDialogOpen] = useState(false);
-  const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen = useState(false);
+  const [isNewUserDialogOpen, setIsNewUserDialogOpen = useState(false);
+  const [isEditUserDialogOpen, setIsEditUserDialogOpen = useState(false);
 
   // Only admin can access settings
   if (user?.role !== 'admin') {
@@ -75,7 +74,7 @@ const Settings = () => {
     };
     
     updateRestaurant(updatedRestaurant);
-    toast.success('Restaurant information updated');
+    // Toast notification is now added in the updateRestaurantInfo function
   };
   
   // Handle password change
