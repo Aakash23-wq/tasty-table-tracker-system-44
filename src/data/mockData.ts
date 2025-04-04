@@ -35,7 +35,7 @@ export const usersData: User[] = [
   {
     id: "user003",
     name: "Mike Johnson",
-    role: "chef",
+    role: "waiter", // Changed from chef to waiter
     email: "mike@tastytable.com",
     phone: "+1 (555) 333-4444",
     address: "101 Culinary Blvd, Foodville",

@@ -24,8 +24,7 @@ export const MenuItemCard = ({ item, onSelect, selectable = false }: MenuItemCar
   };
   
   const isAdmin = user?.role === 'admin';
-  const isChef = user?.role === 'chef';
-  const canToggleAvailability = isAdmin || isChef;
+  const canToggleAvailability = isAdmin;
 
   return (
     <Card className={`restaurant-card h-full ${!item.isAvailable ? 'opacity-60' : ''}`}>
@@ -72,4 +71,3 @@ export const MenuItemCard = ({ item, onSelect, selectable = false }: MenuItemCar
     </Card>
   );
 };
-
