@@ -91,16 +91,6 @@ const Login = () => {
               </div>
             </form>
           </CardContent>
-          <CardFooter className="flex flex-col">
-            <div className="text-sm text-center text-gray-500 mt-2">
-              <p className="mt-2">Demo accounts (password: password):</p>
-              <div className="mt-1 space-x-2">
-                <Button variant="link" onClick={() => setEmail('admin@tastytable.com')}>Admin</Button>
-                <Button variant="link" onClick={() => setEmail('jane@tastytable.com')}>Waiter</Button>
-                <Button variant="link" onClick={() => setEmail('mike@tastytable.com')}>Chef</Button>
-              </div>
-            </div>
-          </CardFooter>
         </Card>
       </div>
     </div>

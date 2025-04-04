@@ -1,13 +1,12 @@
 
-import React, { useState } from "react";
 import { Order } from "@/types";
-import { ordersData } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
 import { OrderContextType } from "./types";
+import { useOrdersDB } from "@/services/DatabaseService";
 
 export function useOrderProvider(): OrderContextType {
   const { toast } = useToast();
-  const [orders, setOrders] = useState<Order[]>(ordersData);
+  const [orders, setOrders, addOrderToDb] = useOrdersDB();
 
   // Create a new order
   const createOrder = (orderData: Omit<Order, "id" | "createdAt" | "updatedAt">) => {
@@ -17,23 +16,27 @@ export function useOrderProvider(): OrderContextType {
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    setOrders(prev => [...prev, newOrder]);
+    
+    addOrderToDb(newOrder);
+    
     toast({
       title: "Order created",
       description: `New order created successfully`,
     });
+    
     return newOrder;
   };
 
   // Update order status
   const updateOrderStatus = (orderId: string, status: Order["status"]) => {
-    setOrders(prevOrders => 
-      prevOrders.map(order => 
-        order.id === orderId 
-          ? { ...order, status, updatedAt: new Date() } 
-          : order
-      )
+    const updatedOrders = orders.map(order => 
+      order.id === orderId 
+        ? { ...order, status, updatedAt: new Date() } 
+        : order
     );
+    
+    setOrders(updatedOrders);
+    
     toast({
       title: "Order updated",
       description: `Order status changed to ${status}`,
@@ -42,21 +45,21 @@ export function useOrderProvider(): OrderContextType {
 
   // Update order item status
   const updateOrderItemStatus = (orderId: string, orderItemId: string, status: "pending" | "preparing" | "ready" | "served" | "cancelled") => {
-    setOrders(prevOrders => 
-      prevOrders.map(order => 
-        order.id === orderId 
-          ? { 
-              ...order, 
-              items: order.items.map(item => 
-                item.id === orderItemId 
-                  ? { ...item, status } 
-                  : item
-              ),
-              updatedAt: new Date()
-            } 
-          : order
-      )
+    const updatedOrders = orders.map(order => 
+      order.id === orderId 
+        ? { 
+            ...order, 
+            items: order.items.map(item => 
+              item.id === orderItemId 
+                ? { ...item, status } 
+                : item
+            ),
+            updatedAt: new Date()
+          } 
+        : order
     );
+    
+    setOrders(updatedOrders);
     
     toast({
       title: "Order item updated",

@@ -1,23 +1,23 @@
 
-import React, { useState } from "react";
 import { MenuItem } from "@/types";
-import { menuItemsData } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
 import { MenuContextType } from "./types";
+import { useMenuItemsDB } from "@/services/DatabaseService";
 
 export function useMenuProvider(): MenuContextType {
   const { toast } = useToast();
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(menuItemsData);
+  const [menuItems, setMenuItems, addMenuItemToDb] = useMenuItemsDB();
 
   // Update menu item availability
   const updateMenuItemAvailability = (menuItemId: string, isAvailable: boolean) => {
-    setMenuItems(prevItems => 
-      prevItems.map(item => 
-        item.id === menuItemId 
-          ? { ...item, isAvailable } 
-          : item
-      )
+    const updatedItems = menuItems.map(item => 
+      item.id === menuItemId 
+        ? { ...item, isAvailable } 
+        : item
     );
+    
+    setMenuItems(updatedItems);
+    
     toast({
       title: "Menu updated",
       description: `${isAvailable ? "Added to" : "Removed from"} available menu items`,
@@ -30,11 +30,14 @@ export function useMenuProvider(): MenuContextType {
       id: `item${(menuItems.length + 1).toString().padStart(3, '0')}`,
       ...menuItem
     };
-    setMenuItems(prev => [...prev, newMenuItem]);
+    
+    addMenuItemToDb(newMenuItem);
+    
     toast({
       title: "Menu item added",
       description: `${newMenuItem.name} has been added to the menu`
     });
+    
     return newMenuItem;
   };
 

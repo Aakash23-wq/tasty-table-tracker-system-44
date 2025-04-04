@@ -1,9 +1,8 @@
 
-import React, { useState } from "react";
 import { Bill, Order } from "@/types";
-import { billsData } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
 import { BillingContextType } from "./types";
+import { useBillsDB } from "@/services/DatabaseService";
 
 export function useBillingProvider(
   orders: Order[],
@@ -11,7 +10,7 @@ export function useBillingProvider(
   updateOrderStatus: (orderId: string, status: "active" | "completed" | "cancelled") => void
 ): BillingContextType {
   const { toast } = useToast();
-  const [bills, setBills] = useState<Bill[]>(billsData);
+  const [bills, setBills, addBillToDb] = useBillsDB();
 
   // Generate a bill for an order
   const generateBill = (orderId: string, paymentMethod: string = "cash") => {
@@ -39,7 +38,8 @@ export function useBillingProvider(
       createdAt: new Date()
     };
     
-    setBills(prev => [...prev, newBill]);
+    addBillToDb(newBill);
+    
     toast({
       title: "Bill generated",
       description: `Bill totaling ₹${total.toFixed(2)} created`,
@@ -50,13 +50,13 @@ export function useBillingProvider(
 
   // Update bill payment status
   const updateBillPaymentStatus = (billId: string, status: "pending" | "completed" | "failed") => {
-    setBills(prevBills => 
-      prevBills.map(bill => 
-        bill.id === billId 
-          ? { ...bill, paymentStatus: status } 
-          : bill
-      )
+    const updatedBills = bills.map(bill => 
+      bill.id === billId 
+        ? { ...bill, paymentStatus: status } 
+        : bill
     );
+    
+    setBills(updatedBills);
     
     // Get the bill and corresponding order
     const bill = bills.find(b => b.id === billId);

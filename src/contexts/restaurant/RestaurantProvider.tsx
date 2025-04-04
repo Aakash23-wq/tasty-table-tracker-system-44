@@ -1,18 +1,23 @@
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect } from "react";
 import { Restaurant } from "@/types";
-import { restaurantData } from "@/data/mockData";
 import { useTableProvider } from "./TableContext";
 import { useMenuProvider } from "./MenuContext";
 import { useCustomerProvider } from "./CustomerContext";
 import { useOrderProvider } from "./OrderContext";
 import { useBillingProvider } from "./BillingContext";
 import { RestaurantContextType } from "./types";
+import { initializeDatabase, useRestaurantDB } from "@/services/DatabaseService";
 
 const RestaurantContext = createContext<RestaurantContextType | undefined>(undefined);
 
 export function RestaurantProvider({ children }: { children: React.ReactNode }) {
-  const [restaurant] = useState<Restaurant>(restaurantData);
+  // Initialize the database when the app starts
+  useEffect(() => {
+    initializeDatabase();
+  }, []);
+  
+  const [restaurant, setRestaurant] = useRestaurantDB();
   
   // Initialize all the providers
   const tableContext = useTableProvider();
@@ -25,9 +30,15 @@ export function RestaurantProvider({ children }: { children: React.ReactNode }) 
     orderContext.updateOrderStatus
   );
 
+  // Return null during initial loading
+  if (!restaurant) {
+    return <div>Loading restaurant data...</div>;
+  }
+
   // Combine all context values
   const contextValue: RestaurantContextType = {
     restaurant,
+    updateRestaurant: setRestaurant,
     ...tableContext,
     ...menuContext,
     ...customerContext,

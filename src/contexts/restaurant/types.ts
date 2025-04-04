@@ -1,5 +1,5 @@
 
-import { Table, MenuItem, Customer, Order, Bill, Restaurant } from "@/types";
+import { Restaurant, Table, MenuItem, Customer, Order, Bill } from "@/types";
 
 export interface TableContextType {
   tables: Table[];
@@ -19,7 +19,7 @@ export interface CustomerContextType {
 
 export interface OrderContextType {
   orders: Order[];
-  createOrder: (order: Omit<Order, "id" | "createdAt" | "updatedAt">) => Order;
+  createOrder: (orderData: Omit<Order, "id" | "createdAt" | "updatedAt">) => Order;
   updateOrderStatus: (orderId: string, status: Order["status"]) => void;
   updateOrderItemStatus: (orderId: string, orderItemId: string, status: "pending" | "preparing" | "ready" | "served" | "cancelled") => void;
 }
@@ -32,4 +32,5 @@ export interface BillingContextType {
 
 export interface RestaurantContextType extends TableContextType, MenuContextType, CustomerContextType, OrderContextType, BillingContextType {
   restaurant: Restaurant;
+  updateRestaurant: (restaurant: Restaurant) => void;
 }

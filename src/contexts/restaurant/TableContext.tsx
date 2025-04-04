@@ -1,23 +1,23 @@
 
-import React, { useState } from "react";
 import { Table } from "@/types";
-import { tablesData } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
 import { TableContextType } from "./types";
+import { useTablesDB } from "@/services/DatabaseService";
 
 export function useTableProvider(): TableContextType {
   const { toast } = useToast();
-  const [tables, setTables] = useState<Table[]>(tablesData);
+  const [tables, setTables, , ] = useTablesDB();
 
   // Update table status
   const updateTableStatus = (tableId: string, status: Table["status"], customerId?: string, waiterId?: string) => {
-    setTables(prevTables => 
-      prevTables.map(table => 
-        table.id === tableId 
-          ? { ...table, status, currentCustomerId: customerId, waiter: waiterId } 
-          : table
-      )
+    const updatedTables = tables.map(table => 
+      table.id === tableId 
+        ? { ...table, status, currentCustomerId: customerId, waiter: waiterId } 
+        : table
     );
+    
+    setTables(updatedTables);
+    
     toast({
       title: "Table updated",
       description: `Table status changed to ${status}`,
