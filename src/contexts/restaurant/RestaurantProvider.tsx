@@ -38,7 +38,13 @@ export function RestaurantProvider({ children }: { children: React.ReactNode }) 
 
   // Function to update restaurant information
   const updateRestaurantInfo = (updatedRestaurant: Restaurant) => {
-    setRestaurant(updatedRestaurant);
+    // Make sure we're passing a complete restaurant object
+    const completeRestaurant = {
+      ...restaurant,
+      ...updatedRestaurant
+    };
+    
+    setRestaurant(completeRestaurant);
     toast.success("Restaurant information updated successfully");
   };
 

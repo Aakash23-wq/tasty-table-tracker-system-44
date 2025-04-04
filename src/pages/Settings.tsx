@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,6 +25,17 @@ const Settings = () => {
     email: restaurant.email || '',
     openingHours: restaurant.openingHours || ''
   });
+  
+  // Update form when restaurant data changes
+  useEffect(() => {
+    setRestaurantForm({
+      name: restaurant.name,
+      location: restaurant.location,
+      phone: restaurant.phone,
+      email: restaurant.email || '',
+      openingHours: restaurant.openingHours || ''
+    });
+  }, [restaurant]);
   
   // Password change form state
   const [passwordForm, setPasswordForm] = useState({
@@ -74,7 +85,6 @@ const Settings = () => {
     };
     
     updateRestaurant(updatedRestaurant);
-    // Toast notification is now added in the updateRestaurantInfo function
   };
   
   // Handle password change
