@@ -6,6 +6,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 import { Home, Menu, Users, CreditCard, ClipboardList, Table, LogOut, Settings } from 'lucide-react';
+import DatabaseStatus from './DatabaseStatus';
 
 const Layout = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -21,13 +22,21 @@ const Layout = () => {
     { title: "Tables", icon: Table, path: "/tables" },
     { title: "Menu", icon: Menu, path: "/menu" },
     { title: "Orders", icon: ClipboardList, path: "/orders" },
-    { title: "Customers", icon: Users, path: "/customers" },
-    { title: "Billing", icon: CreditCard, path: "/billing" },
   ];
-
-  // Only show Settings for admin role
-  if (user?.role === "admin") {
-    sidebarItems.push({ title: "Settings", icon: Settings, path: "/settings" });
+  
+  // Only show certain menu items based on role
+  if (user?.role === 'admin') {
+    sidebarItems.push(
+      { title: "Customers", icon: Users, path: "/customers" },
+      { title: "Billing", icon: CreditCard, path: "/billing" },
+      { title: "Settings", icon: Settings, path: "/settings" }
+    );
+  } else if (user?.role === 'waiter') {
+    // Waiters can still access customers for taking orders and billing for generating bills
+    sidebarItems.push(
+      { title: "Customers", icon: Users, path: "/customers" },
+      { title: "Billing", icon: CreditCard, path: "/billing" }
+    );
   }
 
   return (
@@ -95,8 +104,11 @@ const Layout = () => {
                 {getPageTitle(window.location.pathname)}
               </h1>
             </div>
-            <div className="text-sm text-gray-500">
-              {new Date().toLocaleDateString()}
+            <div className="flex items-center space-x-4">
+              <DatabaseStatus />
+              <div className="text-sm text-gray-500">
+                {new Date().toLocaleDateString()}
+              </div>
             </div>
           </header>
           <main className="flex-1 p-6 bg-gray-50 overflow-auto">

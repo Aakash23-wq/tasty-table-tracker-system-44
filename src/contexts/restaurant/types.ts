@@ -33,4 +33,5 @@ export interface BillingContextType {
 export interface RestaurantContextType extends TableContextType, MenuContextType, CustomerContextType, OrderContextType, BillingContextType {
   restaurant: Restaurant;
   updateRestaurant: (restaurant: Restaurant) => void;
+  sqlDbConnected?: boolean; // New flag to indicate SQL database connection status
 }

@@ -34,6 +34,21 @@ export const TableCard = ({ table, onSelect }: TableCardProps) => {
       updateTableStatus(table.id, status, undefined, user.id);
     }
   };
+  
+  // Function to determine if user has certain permissions
+  const canChangeStatus = () => {
+    if (!user) return false;
+    
+    // Admin can do everything
+    if (user.role === 'admin') return true;
+    
+    // Waiters can only mark tables as available or occupied
+    if (user.role === 'waiter') {
+      return ['available', 'occupied'].includes(status);
+    }
+    
+    return false;
+  };
 
   return (
     <Card className="restaurant-card h-full">
@@ -49,6 +64,7 @@ export const TableCard = ({ table, onSelect }: TableCardProps) => {
         </div>
         
         <div className="mt-4 space-y-2">
+          {/* Show different button options based on role */}
           {user?.role === 'admin' && (
             <div className="flex space-x-2 text-xs">
               <Button 
@@ -74,6 +90,29 @@ export const TableCard = ({ table, onSelect }: TableCardProps) => {
                 onClick={() => handleStatusChange('reserved')}
               >
                 Reserved
+              </Button>
+            </div>
+          )}
+          
+          {/* Waiters can only toggle between available and occupied */}
+          {user?.role === 'waiter' && (
+            <div className="flex space-x-2 text-xs">
+              <Button 
+                size="sm" 
+                variant={table.status === 'available' ? 'default' : 'outline'} 
+                className="flex-1"
+                onClick={() => handleStatusChange('available')}
+              >
+                Mark Available
+              </Button>
+              <Button 
+                size="sm" 
+                variant={table.status === 'occupied' ? 'default' : 'outline'} 
+                className="flex-1"
+                onClick={() => handleStatusChange('occupied')}
+                disabled={table.status === 'reserved'}
+              >
+                Mark Occupied
               </Button>
             </div>
           )}

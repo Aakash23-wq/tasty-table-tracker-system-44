@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { Restaurant } from "@/types";
 import { useTableProvider } from "./TableContext";
 import { useMenuProvider } from "./MenuContext";
@@ -8,17 +8,30 @@ import { useOrderProvider } from "./OrderContext";
 import { useBillingProvider } from "./BillingContext";
 import { RestaurantContextType } from "./types";
 import { initializeDatabase, useRestaurantDB } from "@/services/DatabaseService";
+import { initSqlDatabase, getRestaurantInfo, updateRestaurantInfo } from "@/services/SqlDatabaseService";
 import { toast } from "sonner";
 
 const RestaurantContext = createContext<RestaurantContextType | undefined>(undefined);
 
 export function RestaurantProvider({ children }: { children: React.ReactNode }) {
-  // Initialize the database when the app starts
-  useEffect(() => {
-    initializeDatabase();
-  }, []);
+  const [restaurant, setRestaurantState] = useRestaurantDB();
+  const [sqlInitialized, setSqlInitialized] = useState(false);
   
-  const [restaurant, setRestaurant] = useRestaurantDB();
+  // Initialize both databases when the app starts
+  useEffect(() => {
+    // Initialize localStorage database (legacy)
+    initializeDatabase();
+    
+    // Initialize SQL database (new)
+    const sqlInit = initSqlDatabase();
+    setSqlInitialized(sqlInit);
+    
+    // Check if we have restaurant data in SQL DB
+    const sqlRestaurant = getRestaurantInfo();
+    if (sqlRestaurant) {
+      setRestaurantState(sqlRestaurant);
+    }
+  }, []);
   
   // Initialize all the providers
   const tableContext = useTableProvider();
@@ -36,22 +49,31 @@ export function RestaurantProvider({ children }: { children: React.ReactNode }) 
     return <div>Loading restaurant data...</div>;
   }
 
-  // Function to update restaurant information
-  const updateRestaurantInfo = (updatedRestaurant: Restaurant) => {
+  // Function to update restaurant information (now using both systems)
+  const updateRestaurant = (updatedRestaurant: Restaurant) => {
     // Make sure we're passing a complete restaurant object
     const completeRestaurant = {
       ...restaurant,
       ...updatedRestaurant
     };
     
-    setRestaurant(completeRestaurant);
+    // Update in localStorage (legacy)
+    setRestaurantState(completeRestaurant);
+    
+    // Update in SQL database (new)
+    if (sqlInitialized) {
+      updateRestaurantInfo(completeRestaurant);
+    }
+    
     toast.success("Restaurant information updated successfully");
   };
 
   // Combine all context values
   const contextValue: RestaurantContextType = {
     restaurant,
-    updateRestaurant: updateRestaurantInfo,
+    updateRestaurant,
+    // Include flag to let components know if SQL DB is available
+    sqlDbConnected: sqlInitialized,
     ...tableContext,
     ...menuContext,
     ...customerContext,
