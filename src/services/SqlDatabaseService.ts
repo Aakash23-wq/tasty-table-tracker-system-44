@@ -60,6 +60,7 @@ export const updateRestaurantInfo = (restaurant: Restaurant): boolean => {
   try {
     // For our simulation, we'll just update localStorage
     localStorage.setItem("restaurant", JSON.stringify(restaurant));
+    console.log("Restaurant info updated in SQL database:", restaurant);
     return true;
   } catch (error) {
     console.error("Error updating restaurant info in SQL:", error);

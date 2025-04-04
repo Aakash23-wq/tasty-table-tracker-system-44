@@ -23,7 +23,7 @@ export function RestaurantProvider({ children }: { children: React.ReactNode }) 
     initializeDatabase();
     
     // Initialize SQL database (new)
-    initSqlDatabase();
+    const sqlInitialized = initSqlDatabase();
     
     // Check if SQL database is connected
     const sqlConnected = isSqlConnected();
@@ -34,6 +34,7 @@ export function RestaurantProvider({ children }: { children: React.ReactNode }) 
       const sqlRestaurant = getRestaurantInfo();
       if (sqlRestaurant) {
         setRestaurantState(sqlRestaurant);
+        console.log("Loaded restaurant data from SQL database:", sqlRestaurant);
       }
     }
   }, []);
@@ -62,15 +63,22 @@ export function RestaurantProvider({ children }: { children: React.ReactNode }) 
       ...updatedRestaurant
     };
     
-    // Update in localStorage (legacy)
-    setRestaurantState(completeRestaurant);
-    
-    // Update in SQL database (new)
+    // Update in SQL database (new) first if connected
+    let sqlUpdateSuccessful = false;
     if (sqlDbConnected) {
-      updateRestaurantInfo(completeRestaurant);
+      sqlUpdateSuccessful = updateRestaurantInfo(completeRestaurant);
+      console.log("SQL update successful:", sqlUpdateSuccessful);
     }
     
-    toast.success("Restaurant information updated successfully");
+    // Always update in localStorage (legacy) as fallback
+    setRestaurantState(completeRestaurant);
+    
+    // Show appropriate toast message
+    if (sqlDbConnected && sqlUpdateSuccessful) {
+      toast.success("Restaurant information updated in SQL database");
+    } else {
+      toast.success("Restaurant information updated in local storage");
+    }
   };
 
   // Combine all context values
