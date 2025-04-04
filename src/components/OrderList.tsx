@@ -158,4 +158,3 @@ const OrderList = ({ orders, showTableInfo = true }: OrderListProps) => {
 };
 
 export default OrderList;
-
