@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { User, Table, MenuItem, Customer, Order, Bill, Restaurant } from '@/types';
+import { usersData, tablesData, menuItemsData, customersData, ordersData, billsData, restaurantData } from '@/data/mockData';
 
 // This is a mock implementation that simulates a database
 // In a real application, this would connect to a real database
@@ -19,9 +20,6 @@ const STORAGE_KEYS = {
 
 // Initialize the database with default values if not already present
 export const initializeDatabase = () => {
-  // Import default data
-  const { usersData, tablesData, menuItemsData, customersData, ordersData, billsData, restaurantData } = require('@/data/mockData');
-  
   // Check if data exists in localStorage, if not, initialize with mock data
   if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(usersData));
