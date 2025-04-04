@@ -43,9 +43,18 @@ const Settings = () => {
     phone: ''
   });
   
+  // Edit user form state
+  const [editUserForm, setEditUserForm] = useState({
+    id: '',
+    name: '',
+    email: '',
+    phone: ''
+  });
+  
   // Dialog states
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [isNewUserDialogOpen, setIsNewUserDialogOpen] = useState(false);
+  const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
 
   // Only admin can access settings
   if (user?.role !== 'admin') {
@@ -124,16 +133,37 @@ const Settings = () => {
     setIsNewUserDialogOpen(false);
   };
   
-  // Handle user name update
-  const handleUpdateUserName = (userId: string, newName: string) => {
-    if (newName.trim() === '') return;
+  // Handle opening edit user dialog
+  const openEditUserDialog = (userToEdit: User) => {
+    setEditUserForm({
+      id: userToEdit.id,
+      name: userToEdit.name,
+      email: userToEdit.email,
+      phone: userToEdit.phone || ''
+    });
+    setIsEditUserDialogOpen(true);
+  };
+  
+  // Handle edit user submission
+  const handleEditUserSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     
-    const success = updateUserInfo(userId, { name: newName });
+    if (!editUserForm.name || !editUserForm.email) {
+      toast.error('Name and email are required');
+      return;
+    }
+    
+    const success = updateUserInfo(editUserForm.id, {
+      name: editUserForm.name,
+      email: editUserForm.email,
+      phone: editUserForm.phone || undefined
+    });
     
     if (success) {
-      toast.success('User name updated');
+      toast.success('User information updated successfully');
+      setIsEditUserDialogOpen(false);
     } else {
-      toast.error('Failed to update user name');
+      toast.error('Failed to update user information');
     }
   };
 
@@ -283,6 +313,47 @@ const Settings = () => {
                 </Dialog>
               </div>
               
+              {/* Edit User Dialog */}
+              <Dialog open={isEditUserDialogOpen} onOpenChange={setIsEditUserDialogOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Edit User</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleEditUserSubmit} className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-name">Name</Label>
+                      <Input
+                        id="edit-name"
+                        value={editUserForm.name}
+                        onChange={(e) => setEditUserForm({...editUserForm, name: e.target.value})}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-email">Email</Label>
+                      <Input
+                        id="edit-email"
+                        type="email"
+                        value={editUserForm.email}
+                        onChange={(e) => setEditUserForm({...editUserForm, email: e.target.value})}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-phone">Phone Number</Label>
+                      <Input
+                        id="edit-phone"
+                        value={editUserForm.phone}
+                        onChange={(e) => setEditUserForm({...editUserForm, phone: e.target.value})}
+                      />
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit">Save Changes</Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+              
               <div className="space-y-4">
                 {users.map((user: User) => (
                   <Card key={user.id}>
@@ -290,11 +361,7 @@ const Settings = () => {
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                         <div className="space-y-2 mb-4 md:mb-0">
                           <div className="flex items-center space-x-2">
-                            <Input 
-                              className="font-semibold"
-                              value={user.name}
-                              onChange={(e) => handleUpdateUserName(user.id, e.target.value)}
-                            />
+                            <h3 className="font-semibold">{user.name}</h3>
                             <Badge className={user.role === 'admin' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}>
                               {user.role}
                             </Badge>
@@ -303,57 +370,66 @@ const Settings = () => {
                           {user.phone && <p className="text-sm text-gray-500">{user.phone}</p>}
                         </div>
                         
-                        <Dialog open={isPasswordDialogOpen && passwordForm.userId === user.id} 
-                               onOpenChange={(open) => {
-                                 setIsPasswordDialogOpen(open);
-                                 if (!open) setPasswordForm({...passwordForm, userId: ''});
-                               }}>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" onClick={() => setPasswordForm({...passwordForm, userId: user.id})}>
-                              Change Password
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Change Password</DialogTitle>
-                            </DialogHeader>
-                            <form onSubmit={handlePasswordChange} className="space-y-4 py-4">
-                              <div className="space-y-2">
-                                <Label htmlFor="current-password">Current Password</Label>
-                                <Input
-                                  id="current-password"
-                                  type="password"
-                                  value={passwordForm.currentPassword}
-                                  onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
-                                  required
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor="new-password">New Password</Label>
-                                <Input
-                                  id="new-password"
-                                  type="password"
-                                  value={passwordForm.newPassword}
-                                  onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
-                                  required
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor="confirm-password">Confirm New Password</Label>
-                                <Input
-                                  id="confirm-password"
-                                  type="password"
-                                  value={passwordForm.confirmPassword}
-                                  onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
-                                  required
-                                />
-                              </div>
-                              <DialogFooter>
-                                <Button type="submit">Change Password</Button>
-                              </DialogFooter>
-                            </form>
-                          </DialogContent>
-                        </Dialog>
+                        <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+                          <Button 
+                            variant="outline" 
+                            onClick={() => openEditUserDialog(user)}
+                          >
+                            Edit Details
+                          </Button>
+                          
+                          <Dialog open={isPasswordDialogOpen && passwordForm.userId === user.id} 
+                                onOpenChange={(open) => {
+                                  setIsPasswordDialogOpen(open);
+                                  if (!open) setPasswordForm({...passwordForm, userId: ''});
+                                }}>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" onClick={() => setPasswordForm({...passwordForm, userId: user.id})}>
+                                Change Password
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Change Password</DialogTitle>
+                              </DialogHeader>
+                              <form onSubmit={handlePasswordChange} className="space-y-4 py-4">
+                                <div className="space-y-2">
+                                  <Label htmlFor="current-password">Current Password</Label>
+                                  <Input
+                                    id="current-password"
+                                    type="password"
+                                    value={passwordForm.currentPassword}
+                                    onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
+                                    required
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor="new-password">New Password</Label>
+                                  <Input
+                                    id="new-password"
+                                    type="password"
+                                    value={passwordForm.newPassword}
+                                    onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
+                                    required
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor="confirm-password">Confirm New Password</Label>
+                                  <Input
+                                    id="confirm-password"
+                                    type="password"
+                                    value={passwordForm.confirmPassword}
+                                    onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
+                                    required
+                                  />
+                                </div>
+                                <DialogFooter>
+                                  <Button type="submit">Change Password</Button>
+                                </DialogFooter>
+                              </form>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
