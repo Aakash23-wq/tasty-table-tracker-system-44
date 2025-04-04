@@ -16,7 +16,7 @@ const Orders = () => {
   const tableIdParam = searchParams.get('tableId');
   
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>(tableIdParam ? 'all' : 'active');
   const [tableFilter, setTableFilter] = useState<string>(tableIdParam || 'all');
 
   // Filter orders based on user role
@@ -32,11 +32,6 @@ const Orders = () => {
     
     return orderIdMatches && statusMatches && tableMatches;
   });
-
-  // Show only active orders by default
-  const displayedOrders = statusFilter === 'all' 
-    ? filteredOrders 
-    : filteredOrders;
 
   return (
     <div className="space-y-6">
@@ -81,7 +76,7 @@ const Orders = () => {
         </Select>
       </div>
 
-      <OrderList orders={displayedOrders} />
+      <OrderList orders={filteredOrders} />
     </div>
   );
 };

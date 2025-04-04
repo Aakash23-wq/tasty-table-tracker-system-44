@@ -1,105 +1,95 @@
 
 import React, { useState } from 'react';
 import { useRestaurant } from '@/contexts/RestaurantContext';
-import { TableCard } from '@/components/TableCard';
-import { Table } from '@/types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { useAuth } from '@/contexts/AuthContext';
+import TableCard from '@/components/TableCard';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Link } from 'react-router-dom';
 
 const Tables = () => {
   const { tables } = useRestaurant();
-  const { user } = useAuth();
-  const [selectedTable, setSelectedTable] = useState<Table | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const availableTables = tables.filter(table => table.status === 'available');
-  const occupiedTables = tables.filter(table => table.status === 'occupied');
-  const reservedTables = tables.filter(table => table.status === 'reserved');
-
-  const handleTableSelect = (table: Table) => {
-    setSelectedTable(table);
-    setIsDialogOpen(true);
-  };
-
-  const statusCounts = {
-    total: tables.length,
-    available: availableTables.length,
-    occupied: occupiedTables.length,
-    reserved: reservedTables.length
-  };
-
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  
+  const filteredTables = tables.filter(table => {
+    const tableNumberMatches = table.number.toString().includes(searchTerm);
+    const statusMatches = statusFilter === 'all' || table.status === statusFilter;
+    
+    return tableNumberMatches && statusMatches;
+  });
+  
+  // Count tables by status
+  const availableCount = tables.filter(table => table.status === 'available').length;
+  const occupiedCount = tables.filter(table => table.status === 'occupied').length;
+  const reservedCount = tables.filter(table => table.status === 'reserved').length;
+  
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Tables Management</h2>
-          <p className="text-gray-500">Manage restaurant tables and their status</p>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <Badge className="bg-gray-100 text-gray-800">
-            Total: {statusCounts.total}
-          </Badge>
-          <Badge className="bg-green-100 text-green-800">
-            Available: {statusCounts.available}
-          </Badge>
-          <Badge className="bg-red-100 text-red-800">
-            Occupied: {statusCounts.occupied}
-          </Badge>
-          <Badge className="bg-yellow-100 text-yellow-800">
-            Reserved: {statusCounts.reserved}
-          </Badge>
+          <h2 className="text-2xl font-bold">Tables</h2>
+          <p className="text-gray-500">Manage restaurant tables</p>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {tables.map((table) => (
-          <TableCard 
-            key={table.id} 
-            table={table} 
-            onSelect={handleTableSelect}
-          />
+      
+      <div className="flex flex-wrap gap-2 md:gap-4 mb-4">
+        <div className="bg-green-100 text-green-800 rounded-lg px-3 py-1 flex items-center">
+          <div className="h-3 w-3 rounded-full bg-green-500 mr-2"></div>
+          <span className="font-medium">Available:</span>
+          <span className="ml-1">{availableCount}</span>
+        </div>
+        <div className="bg-red-100 text-red-800 rounded-lg px-3 py-1 flex items-center">
+          <div className="h-3 w-3 rounded-full bg-red-500 mr-2"></div>
+          <span className="font-medium">Occupied:</span>
+          <span className="ml-1">{occupiedCount}</span>
+        </div>
+        <div className="bg-yellow-100 text-yellow-800 rounded-lg px-3 py-1 flex items-center">
+          <div className="h-3 w-3 rounded-full bg-yellow-500 mr-2"></div>
+          <span className="font-medium">Reserved:</span>
+          <span className="ml-1">{reservedCount}</span>
+        </div>
+      </div>
+      
+      <div className="flex flex-col md:flex-row gap-4">
+        <Input
+          placeholder="Search by table number..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="md:w-1/3"
+        />
+        
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="md:w-1/3">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="available">Available</SelectItem>
+            <SelectItem value="occupied">Occupied</SelectItem>
+            <SelectItem value="reserved">Reserved</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        <div className="md:ml-auto">
+          <Button asChild>
+            <Link to="/orders/new">Create New Order</Link>
+          </Button>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {filteredTables.map((table) => (
+          <TableCard key={table.id} table={table} />
         ))}
+        
+        {filteredTables.length === 0 && (
+          <div className="col-span-full text-center py-8 text-gray-500">
+            No tables found
+          </div>
+        )}
       </div>
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Table {selectedTable?.number}</DialogTitle>
-          </DialogHeader>
-          
-          {selectedTable && (
-            <div className="py-4">
-              <div className="space-y-4">
-                <div>
-                  <p><strong>Status:</strong> {selectedTable.status}</p>
-                  <p><strong>Capacity:</strong> {selectedTable.capacity} people</p>
-                </div>
-                
-                <div className="flex justify-end gap-2">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setIsDialogOpen(false)}
-                  >
-                    Close
-                  </Button>
-                  {selectedTable.status === 'available' && (
-                    <Button as="a" href={`/orders/new?tableId=${selectedTable.id}`}>
-                      Create Order
-                    </Button>
-                  )}
-                  {selectedTable.status === 'occupied' && (
-                    <Button as="a" href={`/orders?tableId=${selectedTable.id}`}>
-                      View Order
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
