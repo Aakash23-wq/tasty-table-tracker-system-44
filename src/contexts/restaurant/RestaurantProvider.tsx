@@ -8,14 +8,14 @@ import { useOrderProvider } from "./OrderContext";
 import { useBillingProvider } from "./BillingContext";
 import { RestaurantContextType } from "./types";
 import { initializeDatabase, useRestaurantDB } from "@/services/DatabaseService";
-import { initSqlDatabase, getRestaurantInfo, updateRestaurantInfo } from "@/services/SqlDatabaseService";
+import { initSqlDatabase, isSqlConnected, getRestaurantInfo, updateRestaurantInfo } from "@/services/SqlDatabaseService";
 import { toast } from "sonner";
 
 const RestaurantContext = createContext<RestaurantContextType | undefined>(undefined);
 
 export function RestaurantProvider({ children }: { children: React.ReactNode }) {
   const [restaurant, setRestaurantState] = useRestaurantDB();
-  const [sqlInitialized, setSqlInitialized] = useState(false);
+  const [sqlDbConnected, setSqlDbConnected] = useState(false);
   
   // Initialize both databases when the app starts
   useEffect(() => {
@@ -23,13 +23,18 @@ export function RestaurantProvider({ children }: { children: React.ReactNode }) 
     initializeDatabase();
     
     // Initialize SQL database (new)
-    const sqlInit = initSqlDatabase();
-    setSqlInitialized(sqlInit);
+    initSqlDatabase();
+    
+    // Check if SQL database is connected
+    const sqlConnected = isSqlConnected();
+    setSqlDbConnected(sqlConnected);
     
     // Check if we have restaurant data in SQL DB
-    const sqlRestaurant = getRestaurantInfo();
-    if (sqlRestaurant) {
-      setRestaurantState(sqlRestaurant);
+    if (sqlConnected) {
+      const sqlRestaurant = getRestaurantInfo();
+      if (sqlRestaurant) {
+        setRestaurantState(sqlRestaurant);
+      }
     }
   }, []);
   
@@ -61,7 +66,7 @@ export function RestaurantProvider({ children }: { children: React.ReactNode }) 
     setRestaurantState(completeRestaurant);
     
     // Update in SQL database (new)
-    if (sqlInitialized) {
+    if (sqlDbConnected) {
       updateRestaurantInfo(completeRestaurant);
     }
     
@@ -73,7 +78,7 @@ export function RestaurantProvider({ children }: { children: React.ReactNode }) 
     restaurant,
     updateRestaurant,
     // Include flag to let components know if SQL DB is available
-    sqlDbConnected: sqlInitialized,
+    sqlDbConnected,
     ...tableContext,
     ...menuContext,
     ...customerContext,
