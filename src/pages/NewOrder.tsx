@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useRestaurant } from '@/contexts/RestaurantContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -19,7 +20,7 @@ const NewOrder = () => {
   const tableIdParam = searchParams.get('tableId');
   
   const [selectedTableId, setSelectedTableId] = useState<string>(tableIdParam || '');
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('none');
   const [customerName, setCustomerName] = useState<string>('');
   const [customerPhone, setCustomerPhone] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -114,13 +115,13 @@ const NewOrder = () => {
     
     const newOrder = createOrder({
       tableId: selectedTableId,
-      customerId: selectedCustomerId || undefined,
+      customerId: selectedCustomerId !== 'none' ? selectedCustomerId : undefined,
       waiterId: user.id,
       items: cartItems,
       status: 'active'
     });
     
-    updateTableStatus(selectedTableId, 'occupied', selectedCustomerId || undefined, user.id);
+    updateTableStatus(selectedTableId, 'occupied', selectedCustomerId !== 'none' ? selectedCustomerId : undefined, user.id);
     
     navigate(`/orders?tableId=${selectedTableId}`);
     
@@ -129,7 +130,7 @@ const NewOrder = () => {
   
   useEffect(() => {
     setCartItems([]);
-    setSelectedCustomerId('');
+    setSelectedCustomerId('none');
     setCustomerName('');
     setCustomerPhone('');
   }, [selectedTableId]);
@@ -174,7 +175,7 @@ const NewOrder = () => {
                           <SelectValue placeholder="Select a customer (optional)" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">No customer selected</SelectItem>
+                          <SelectItem value="none">No customer selected</SelectItem>
                           {customers.map(customer => (
                             <SelectItem key={customer.id} value={customer.id}>
                               {customer.name} {customer.phone ? `(${customer.phone})` : ''}
