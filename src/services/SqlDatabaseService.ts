@@ -58,9 +58,9 @@ export const updateRestaurantInfo = (restaurant: Restaurant): boolean => {
   // Simulate updating the SQL database
   // In a real app, this would execute an SQL UPDATE query
   try {
-    // For our simulation, we'll just update localStorage
+    // For our simulation, we'll store data in localStorage and log it
     localStorage.setItem("restaurant", JSON.stringify(restaurant));
-    console.log("Restaurant info updated in SQL database:", restaurant);
+    console.info("Restaurant info updated successfully in SQL database:", restaurant);
     return true;
   } catch (error) {
     console.error("Error updating restaurant info in SQL:", error);

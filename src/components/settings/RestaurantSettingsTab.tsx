@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Restaurant } from '@/types';
 import { toast } from 'sonner';
+import { Save } from 'lucide-react';
 
 interface RestaurantSettingsTabProps {
   restaurant: Restaurant;
@@ -20,6 +21,7 @@ const RestaurantSettingsTab = ({ restaurant, updateRestaurant }: RestaurantSetti
   const [restaurantEmail, setRestaurantEmail] = useState(restaurant?.email || '');
   const [restaurantDescription, setRestaurantDescription] = useState(restaurant?.description || '');
   const [restaurantOpeningHours, setRestaurantOpeningHours] = useState(restaurant?.openingHours || '');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Handle restaurant settings form submission
   const handleSaveRestaurantSettings = () => {
@@ -28,21 +30,31 @@ const RestaurantSettingsTab = ({ restaurant, updateRestaurant }: RestaurantSetti
       return;
     }
     
-    const updatedRestaurant = {
-      ...restaurant,
-      name: restaurantName,
-      location: restaurantLocation,
-      phone: restaurantPhone,
-      email: restaurantEmail,
-      description: restaurantDescription,
-      openingHours: restaurantOpeningHours
-    };
+    setIsSubmitting(true);
     
-    updateRestaurant(updatedRestaurant);
+    try {
+      const updatedRestaurant = {
+        ...restaurant,
+        name: restaurantName,
+        location: restaurantLocation,
+        phone: restaurantPhone,
+        email: restaurantEmail,
+        description: restaurantDescription,
+        openingHours: restaurantOpeningHours
+      };
+      
+      updateRestaurant(updatedRestaurant);
+      toast.success("Restaurant information updated successfully");
+    } catch (error) {
+      console.error("Error updating restaurant:", error);
+      toast.error("Failed to update restaurant information");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Restaurant Information</CardTitle>
       </CardHeader>
@@ -53,6 +65,9 @@ const RestaurantSettingsTab = ({ restaurant, updateRestaurant }: RestaurantSetti
             id="restaurantName" 
             value={restaurantName} 
             onChange={(e) => setRestaurantName(e.target.value)} 
+            placeholder="Enter restaurant name"
+            className="w-full"
+            required
           />
         </div>
         <div className="space-y-2">
@@ -61,6 +76,8 @@ const RestaurantSettingsTab = ({ restaurant, updateRestaurant }: RestaurantSetti
             id="restaurantLocation" 
             value={restaurantLocation} 
             onChange={(e) => setRestaurantLocation(e.target.value)} 
+            placeholder="Enter restaurant location"
+            className="w-full"
           />
         </div>
         <div className="space-y-2">
@@ -69,6 +86,8 @@ const RestaurantSettingsTab = ({ restaurant, updateRestaurant }: RestaurantSetti
             id="restaurantPhone" 
             value={restaurantPhone} 
             onChange={(e) => setRestaurantPhone(e.target.value)} 
+            placeholder="Enter restaurant phone"
+            className="w-full"
           />
         </div>
         <div className="space-y-2">
@@ -78,6 +97,8 @@ const RestaurantSettingsTab = ({ restaurant, updateRestaurant }: RestaurantSetti
             type="email" 
             value={restaurantEmail} 
             onChange={(e) => setRestaurantEmail(e.target.value)} 
+            placeholder="Enter restaurant email"
+            className="w-full"
           />
         </div>
         <div className="space-y-2">
@@ -86,6 +107,8 @@ const RestaurantSettingsTab = ({ restaurant, updateRestaurant }: RestaurantSetti
             id="restaurantDescription" 
             value={restaurantDescription} 
             onChange={(e) => setRestaurantDescription(e.target.value)} 
+            placeholder="Enter restaurant description"
+            className="w-full"
           />
         </div>
         <div className="space-y-2">
@@ -94,11 +117,20 @@ const RestaurantSettingsTab = ({ restaurant, updateRestaurant }: RestaurantSetti
             id="restaurantOpeningHours" 
             value={restaurantOpeningHours} 
             onChange={(e) => setRestaurantOpeningHours(e.target.value)} 
+            placeholder="e.g., Mon-Sun: 9:00 AM - 10:00 PM"
+            className="w-full"
           />
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleSaveRestaurantSettings}>Save Changes</Button>
+        <Button 
+          onClick={handleSaveRestaurantSettings} 
+          disabled={isSubmitting}
+          className="flex items-center gap-2"
+        >
+          <Save size={16} />
+          {isSubmitting ? 'Saving...' : 'Save Changes'}
+        </Button>
       </CardFooter>
     </Card>
   );
