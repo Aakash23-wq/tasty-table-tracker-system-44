@@ -1,5 +1,5 @@
 
-import { Restaurant, Table, MenuItem, Customer, Order, Bill } from "@/types";
+import { Restaurant, Table, MenuItem, Customer, Order, Bill, User } from "@/types";
 
 export interface TableContextType {
   tables: Table[];
@@ -34,4 +34,5 @@ export interface RestaurantContextType extends TableContextType, MenuContextType
   restaurant: Restaurant;
   updateRestaurant: (restaurant: Restaurant) => void;
   sqlDbConnected?: boolean; // New flag to indicate SQL database connection status
+  users?: User[]; // Add users to the context
 }

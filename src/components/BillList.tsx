@@ -12,7 +12,7 @@ interface BillListProps {
 }
 
 const BillList = ({ bills }: BillListProps) => {
-  const { tables, customers, updateBillPaymentStatus } = useRestaurant();
+  const { tables, customers, updateBillPaymentStatus, users } = useRestaurant();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -36,6 +36,13 @@ const BillList = ({ bills }: BillListProps) => {
     if (!customerId) return "Guest";
     const customer = customers.find(c => c.id === customerId);
     return customer ? customer.name : "Unknown Customer";
+  };
+
+  // Helper function to get waiter name
+  const getWaiterName = (waiterId?: string) => {
+    if (!waiterId) return "Not assigned";
+    const waiter = users?.find(u => u.id === waiterId);
+    return waiter ? waiter.name : "Unknown Waiter";
   };
 
   return (
@@ -69,6 +76,11 @@ const BillList = ({ bills }: BillListProps) => {
                   </span>
                 )}
               </div>
+              {bill.waiterId && (
+                <div className="text-sm text-gray-500">
+                  Waiter: {getWaiterName(bill.waiterId)}
+                </div>
+              )}
               <div className="text-sm text-gray-500">
                 {new Date(bill.createdAt).toLocaleString()}
               </div>

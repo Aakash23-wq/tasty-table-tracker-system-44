@@ -29,6 +29,7 @@ export function useBillingProvider(
       orderId,
       tableId: order.tableId,
       customerId: order.customerId,
+      waiterId: order.waiterId,
       items: order.items,
       subtotal,
       tax,

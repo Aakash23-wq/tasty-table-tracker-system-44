@@ -69,6 +69,7 @@ export interface Bill {
   orderId: string;
   tableId: string;
   customerId?: string;
+  waiterId?: string;
   items: OrderItem[];
   subtotal: number;
   tax: number;

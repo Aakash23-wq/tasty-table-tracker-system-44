@@ -1,11 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Order, OrderItem as OrderItemType } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useRestaurant } from '@/contexts/RestaurantContext';
 import { IndianRupee } from 'lucide-react';
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 interface OrderListProps {
   orders: Order[];
@@ -13,7 +16,9 @@ interface OrderListProps {
 }
 
 const OrderList = ({ orders, showTableInfo = true }: OrderListProps) => {
-  const { tables, updateOrderStatus, updateOrderItemStatus, generateBill } = useRestaurant();
+  const { tables, users, updateOrderStatus, updateOrderItemStatus, generateBill } = useRestaurant();
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<string>("cash");
   
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -36,12 +41,21 @@ const OrderList = ({ orders, showTableInfo = true }: OrderListProps) => {
     }
   };
 
-  const handleGenerateBill = (order: Order) => {
-    generateBill(order.id);
+  const handleGenerateBill = () => {
+    if (selectedOrder) {
+      generateBill(selectedOrder.id, paymentMethod);
+      setSelectedOrder(null);
+    }
   };
 
   const handleUpdateItemStatus = (orderId: string, itemId: string, status: OrderItemType['status']) => {
     updateOrderItemStatus(orderId, itemId, status);
+  };
+
+  // Helper function to get waiter name
+  const getWaiterName = (waiterId: string) => {
+    const waiter = users?.find(u => u.id === waiterId);
+    return waiter ? waiter.name : "Unknown Waiter";
   };
 
   return (
@@ -67,6 +81,9 @@ const OrderList = ({ orders, showTableInfo = true }: OrderListProps) => {
                   Table: {tables.find(t => t.id === order.tableId)?.number}
                 </div>
               )}
+              <div className="text-sm text-gray-500">
+                Waiter: {getWaiterName(order.waiterId)}
+              </div>
               <div className="text-sm text-gray-500">
                 {new Date(order.createdAt).toLocaleString()}
               </div>
@@ -140,12 +157,50 @@ const OrderList = ({ orders, showTableInfo = true }: OrderListProps) => {
                 
                 {order.status === 'active' && (
                   <div className="pt-2 flex justify-end">
-                    <Button 
-                      onClick={() => handleGenerateBill(order)}
-                      className="w-full"
-                    >
-                      Generate Bill
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button 
+                          className="w-full"
+                          onClick={() => setSelectedOrder(order)}
+                        >
+                          Generate Bill
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Generate Bill</DialogTitle>
+                        </DialogHeader>
+                        <div className="py-4">
+                          <p className="mb-4">Select payment method:</p>
+                          <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                            <div className="flex items-center space-x-2 mb-2">
+                              <RadioGroupItem value="cash" id="cash" />
+                              <Label htmlFor="cash">Cash</Label>
+                            </div>
+                            <div className="flex items-center space-x-2 mb-2">
+                              <RadioGroupItem value="card" id="card" />
+                              <Label htmlFor="card">Credit/Debit Card</Label>
+                            </div>
+                            <div className="flex items-center space-x-2 mb-2">
+                              <RadioGroupItem value="upi" id="upi" />
+                              <Label htmlFor="upi">UPI</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="wallet" id="wallet" />
+                              <Label htmlFor="wallet">Digital Wallet</Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+                        <DialogFooter>
+                          <DialogClose asChild>
+                            <Button variant="outline">Cancel</Button>
+                          </DialogClose>
+                          <DialogClose asChild>
+                            <Button onClick={handleGenerateBill}>Generate Bill</Button>
+                          </DialogClose>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 )}
               </div>
