@@ -8,18 +8,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { IndianRupee } from 'lucide-react';
 
 const Billing = () => {
-  const { bills, tables } = useRestaurant();
+  const { bills, tables, customers } = useRestaurant();
   const [searchTerm, setSearchTerm] = useState('');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>('all');
   const [tableFilter, setTableFilter] = useState<string>('all');
+  const [customerFilter, setCustomerFilter] = useState<string>('all');
 
-  // Filter bills based on search, payment status, and table
+  // Filter bills based on search, payment status, table, and customer
   const filteredBills = bills.filter(bill => {
     const billIdMatches = bill.id.toLowerCase().includes(searchTerm.toLowerCase());
     const statusMatches = paymentStatusFilter === 'all' || bill.paymentStatus === paymentStatusFilter;
     const tableMatches = tableFilter === 'all' || bill.tableId === tableFilter;
+    const customerMatches = customerFilter === 'all' || bill.customerId === customerFilter;
     
-    return billIdMatches && statusMatches && tableMatches;
+    return billIdMatches && statusMatches && tableMatches && customerMatches;
   });
 
   // Calculate total revenue from completed payments
@@ -74,16 +76,16 @@ const Billing = () => {
         </Card>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex flex-col md:flex-row gap-4 flex-wrap">
         <Input
           placeholder="Search by bill ID..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="md:w-1/3"
+          className="md:w-1/4"
         />
         
         <Select value={paymentStatusFilter} onValueChange={setPaymentStatusFilter}>
-          <SelectTrigger className="md:w-1/4">
+          <SelectTrigger className="md:w-1/5">
             <SelectValue placeholder="Filter by payment status" />
           </SelectTrigger>
           <SelectContent>
@@ -95,13 +97,25 @@ const Billing = () => {
         </Select>
         
         <Select value={tableFilter} onValueChange={setTableFilter}>
-          <SelectTrigger className="md:w-1/4">
+          <SelectTrigger className="md:w-1/5">
             <SelectValue placeholder="Filter by table" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Tables</SelectItem>
             {tables.map(table => (
               <SelectItem key={table.id} value={table.id}>Table {table.number}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        
+        <Select value={customerFilter} onValueChange={setCustomerFilter}>
+          <SelectTrigger className="md:w-1/5">
+            <SelectValue placeholder="Filter by customer" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Customers</SelectItem>
+            {customers.map(customer => (
+              <SelectItem key={customer.id} value={customer.id}>{customer.name}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -113,4 +127,3 @@ const Billing = () => {
 };
 
 export default Billing;
-

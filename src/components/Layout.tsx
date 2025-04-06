@@ -5,11 +5,13 @@ import { Sidebar, SidebarContent, SidebarHeader, SidebarGroup, SidebarGroupLabel
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
+import { useRestaurant } from '@/contexts/RestaurantContext';
 import { Home, Menu, Users, CreditCard, ClipboardList, Table, LogOut, Settings } from 'lucide-react';
 import DatabaseStatus from './DatabaseStatus';
 
 const Layout = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const { restaurant } = useRestaurant();
   const location = useLocation();
 
   if (!isAuthenticated) {
@@ -44,8 +46,7 @@ const Layout = () => {
       <div className="min-h-screen flex w-full">
         <Sidebar>
           <SidebarHeader className="flex flex-col items-center justify-center p-4">
-            <h1 className="text-xl font-bold text-white">Tasty Table</h1>
-            <p className="text-xs text-white/70">Restaurant Management</p>
+            <h1 className="text-xl font-bold text-white">{restaurant?.name || "Restaurant"}</h1>
           </SidebarHeader>
           <SidebarContent>
             <SidebarGroup>
