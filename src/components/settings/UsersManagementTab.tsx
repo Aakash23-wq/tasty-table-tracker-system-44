@@ -15,10 +15,16 @@ interface UsersManagementTabProps {
     address: string;
     salary: number;
   }>) => any;
+  deleteUser: (userId: string) => boolean;
+  currentUserId?: string;
 }
 
-const UsersManagementTab = ({ users, addUser }: UsersManagementTabProps) => {
+const UsersManagementTab = ({ users, addUser, deleteUser, currentUserId }: UsersManagementTabProps) => {
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+
+  const handleDeleteUser = (userId: string) => {
+    deleteUser(userId);
+  };
 
   return (
     <div className="space-y-4">
@@ -29,7 +35,12 @@ const UsersManagementTab = ({ users, addUser }: UsersManagementTabProps) => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {users.map(user => (
-          <UserCard key={user.id} user={user} />
+          <UserCard 
+            key={user.id} 
+            user={user} 
+            onDeleteUser={handleDeleteUser}
+            currentUserId={currentUserId}
+          />
         ))}
       </div>
       

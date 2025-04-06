@@ -10,7 +10,7 @@ import SqlConnectionNotice from '@/components/settings/SqlConnectionNotice';
 
 const Settings = () => {
   const { restaurant, updateRestaurant, sqlDbConnected } = useRestaurant();
-  const { user, updateUserInfo, changePassword, users, addUser } = useAuth();
+  const { user, updateUserInfo, changePassword, users, addUser, deleteUser } = useAuth();
   
   const isAdmin = user?.role === 'admin';
 
@@ -52,6 +52,8 @@ const Settings = () => {
             <UsersManagementTab 
               users={users}
               addUser={addUser}
+              deleteUser={deleteUser}
+              currentUserId={user?.id}
             />
           </TabsContent>
         )}

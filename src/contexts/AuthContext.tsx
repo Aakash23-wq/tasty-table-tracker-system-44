@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { User } from "@/types";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +14,7 @@ interface AuthContextType {
   changePassword: (userId: string, currentPassword: string, newPassword: string) => boolean;
   users: User[];
   addUser: (user: Omit<User, "id">) => User;
+  deleteUser: (userId: string) => boolean;
 }
 
 // Store for user passwords (in a real app, this would be handled securely on the backend)
@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [users, setUsers, addUserToDb] = useUsersDB();
+  const [users, setUsers, addUserToDb, deleteUserFromDb] = useUsersDB();
 
   // Initialize the database and password store when the app starts
   useEffect(() => {
@@ -174,6 +174,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return newUser;
   };
 
+  // Delete a user
+  const deleteUser = (userId: string): boolean => {
+    try {
+      // Prevent deleting currently logged in user
+      if (user && user.id === userId) {
+        toast.error("Cannot delete your own account while logged in");
+        return false;
+      }
+      
+      // Delete user from DB
+      deleteUserFromDb(userId);
+      
+      // Remove user's password entry
+      const passwords = JSON.parse(localStorage.getItem(PASSWORDS_STORAGE_KEY) || '[]') as PasswordEntry[];
+      const updatedPasswords = passwords.filter(p => p.userId !== userId);
+      localStorage.setItem(PASSWORDS_STORAGE_KEY, JSON.stringify(updatedPasswords));
+      
+      toast.success("User deleted successfully");
+      return true;
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      toast.error("Failed to delete user");
+      return false;
+    }
+  };
+
   if (isLoading) {
     // Return a loading state if we're still checking for a saved user
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
@@ -188,7 +214,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       updateUserInfo,
       changePassword,
       users,
-      addUser
+      addUser,
+      deleteUser
     }}>
       {children}
     </AuthContext.Provider>
