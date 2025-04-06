@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 import { useRestaurant } from '@/contexts/RestaurantContext';
 import { Home, Menu, Users, CreditCard, ClipboardList, Table, LogOut, Settings } from 'lucide-react';
-import DatabaseStatus from './DatabaseStatus';
 
 const Layout = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -105,11 +104,8 @@ const Layout = () => {
                 {getPageTitle(window.location.pathname)}
               </h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <DatabaseStatus />
-              <div className="text-sm text-gray-500">
-                {new Date().toLocaleDateString()}
-              </div>
+            <div className="text-sm text-gray-500">
+              {new Date().toLocaleDateString()}
             </div>
           </header>
           <main className="flex-1 p-6 bg-gray-50 overflow-auto">
