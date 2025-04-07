@@ -84,7 +84,7 @@ export function useGroceryProvider(): GroceryContextType {
   }, [groceryItems]);
 
   // Add a new grocery item
-  const addGroceryItem = (groceryItem: Omit<GroceryItem, "id" | "image">) => {
+  const addGroceryItem = (groceryItem: Omit<GroceryItem, "id" | "image"> & { isAvailable: boolean }) => {
     const newId = `groc${(groceryItems.length + 1).toString().padStart(3, '0')}`;
     
     const newGroceryItem: GroceryItem = {

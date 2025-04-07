@@ -20,7 +20,7 @@ export interface CustomerContextType {
 
 export interface GroceryContextType {
   groceryItems: GroceryItem[];
-  addGroceryItem: (groceryItem: Omit<GroceryItem, "id" | "image">) => GroceryItem;
+  addGroceryItem: (groceryItem: Omit<GroceryItem, "id" | "image"> & { isAvailable: boolean }) => GroceryItem;
   deleteGroceryItem: (groceryItemId: string) => boolean;
   updateGroceryItemStock: (groceryItemId: string, stock: number) => void;
   updateGroceryItemAvailability: (groceryItemId: string, isAvailable: boolean) => void;

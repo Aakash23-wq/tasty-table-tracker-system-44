@@ -88,7 +88,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 interface AddGroceryDialogProps {
-  onAddGroceryItem: (groceryItem: Omit<FormData, "id" | "image">) => void;
+  onAddGroceryItem: (groceryItem: Omit<FormData, "id" | "image"> & { isAvailable: boolean }) => void;
 }
 
 const AddGroceryDialog: React.FC<AddGroceryDialogProps> = ({ onAddGroceryItem }) => {
