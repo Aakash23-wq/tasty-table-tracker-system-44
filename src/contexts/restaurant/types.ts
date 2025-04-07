@@ -15,6 +15,7 @@ export interface MenuContextType {
 export interface CustomerContextType {
   customers: Customer[];
   addCustomer: (customer: Omit<Customer, "id" | "visits">) => Customer;
+  deleteCustomer: (customerId: string) => boolean;
 }
 
 export interface OrderContextType {
