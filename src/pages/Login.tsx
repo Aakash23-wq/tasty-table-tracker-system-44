@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { getRestaurantInfo } from '@/services/SqlDatabaseService';
 
 interface LocationState {
   from?: {
@@ -18,12 +19,22 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [restaurantName, setRestaurantName] = useState('Restaurant');
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
   // Get the redirect path from location state, or default to '/'
   const from = (location.state as LocationState)?.from?.pathname || '/';
+  
+  // Get restaurant name on load
+  useEffect(() => {
+    // Try to get restaurant name from SQL database or localStorage
+    const restaurantInfo = getRestaurantInfo();
+    if (restaurantInfo?.name) {
+      setRestaurantName(restaurantInfo.name);
+    }
+  }, []);
   
   // If user is already authenticated, redirect them
   useEffect(() => {
@@ -55,10 +66,7 @@ const Login = () => {
       <div className="w-full max-w-md animate-fade-in">
         <Card>
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">Tasty Table</CardTitle>
-            <CardDescription className="text-center">
-              Restaurant Management System
-            </CardDescription>
+            <CardTitle className="text-2xl text-center">{restaurantName}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit}>
