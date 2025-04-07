@@ -1,5 +1,5 @@
 
-import { Restaurant, Table, MenuItem, Customer, Order, Bill, User } from "@/types";
+import { Restaurant, Table, MenuItem, Customer, Order, Bill, User, GroceryItem } from "@/types";
 
 export interface TableContextType {
   tables: Table[];
@@ -18,6 +18,14 @@ export interface CustomerContextType {
   deleteCustomer: (customerId: string) => boolean;
 }
 
+export interface GroceryContextType {
+  groceryItems: GroceryItem[];
+  addGroceryItem: (groceryItem: Omit<GroceryItem, "id" | "image">) => GroceryItem;
+  deleteGroceryItem: (groceryItemId: string) => boolean;
+  updateGroceryItemStock: (groceryItemId: string, stock: number) => void;
+  updateGroceryItemAvailability: (groceryItemId: string, isAvailable: boolean) => void;
+}
+
 export interface OrderContextType {
   orders: Order[];
   createOrder: (orderData: Omit<Order, "id" | "createdAt" | "updatedAt">) => Order;
@@ -31,9 +39,9 @@ export interface BillingContextType {
   updateBillPaymentStatus: (billId: string, status: "pending" | "completed" | "failed") => void;
 }
 
-export interface RestaurantContextType extends TableContextType, MenuContextType, CustomerContextType, OrderContextType, BillingContextType {
+export interface RestaurantContextType extends TableContextType, MenuContextType, CustomerContextType, OrderContextType, BillingContextType, GroceryContextType {
   restaurant: Restaurant;
   updateRestaurant: (restaurant: Restaurant) => void;
-  sqlDbConnected?: boolean; // New flag to indicate SQL database connection status
-  users?: User[]; // Add users to the context
+  sqlDbConnected?: boolean;
+  users?: User[];
 }

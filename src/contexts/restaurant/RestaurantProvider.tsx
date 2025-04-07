@@ -6,6 +6,7 @@ import { useMenuProvider } from "./MenuContext";
 import { useCustomerProvider } from "./CustomerContext";
 import { useOrderProvider } from "./OrderContext";
 import { useBillingProvider } from "./BillingContext";
+import { useGroceryProvider } from "./GroceryContext";
 import { RestaurantContextType } from "./types";
 import { initializeDatabase, useRestaurantDB } from "@/services/DatabaseService";
 import { initSqlDatabase, isSqlConnected, getRestaurantInfo, updateRestaurantInfo } from "@/services/SqlDatabaseService";
@@ -44,6 +45,7 @@ export function RestaurantProvider({ children }: { children: React.ReactNode }) 
   const menuContext = useMenuProvider();
   const customerContext = useCustomerProvider();
   const orderContext = useOrderProvider();
+  const groceryContext = useGroceryProvider();
   const billingContext = useBillingProvider(
     orderContext.orders,
     tableContext.updateTableStatus,
@@ -87,13 +89,13 @@ export function RestaurantProvider({ children }: { children: React.ReactNode }) 
   const contextValue: RestaurantContextType = {
     restaurant,
     updateRestaurant,
-    // Include flag to let components know if SQL DB is available
     sqlDbConnected,
     ...tableContext,
     ...menuContext,
     ...customerContext,
     ...orderContext,
-    ...billingContext
+    ...billingContext,
+    ...groceryContext
   };
 
   return (

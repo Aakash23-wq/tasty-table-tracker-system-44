@@ -6,7 +6,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 import { useRestaurant } from '@/contexts/RestaurantContext';
-import { Home, Menu, Users, CreditCard, ClipboardList, Table, LogOut, Settings } from 'lucide-react';
+import { Home, Menu, Users, CreditCard, ClipboardList, Table, LogOut, Settings, ShoppingBag } from 'lucide-react';
 
 const Layout = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -23,6 +23,7 @@ const Layout = () => {
     { title: "Tables", icon: Table, path: "/tables" },
     { title: "Menu", icon: Menu, path: "/menu" },
     { title: "Orders", icon: ClipboardList, path: "/orders" },
+    { title: "Grocery", icon: ShoppingBag, path: "/grocery" },
   ];
   
   // Only show certain menu items based on role

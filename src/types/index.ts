@@ -43,6 +43,18 @@ export interface Customer {
   feedback?: string;
 }
 
+export interface GroceryItem {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  unit: string;
+  stock: number;
+  isAvailable: boolean;
+  image?: string;
+  expiryDate?: string;
+}
+
 export interface OrderItem {
   id: string;
   menuItemId: string;

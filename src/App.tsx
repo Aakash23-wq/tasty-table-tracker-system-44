@@ -14,6 +14,7 @@ import Menu from "@/pages/Menu";
 import Orders from "@/pages/Orders";
 import NewOrder from "@/pages/NewOrder";
 import Customers from "@/pages/Customers";
+import Grocery from "@/pages/Grocery";
 import Billing from "@/pages/Billing";
 import Settings from "@/pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -37,6 +38,7 @@ const App = () => (
                 <Route path="orders" element={<Orders />} />
                 <Route path="orders/new" element={<NewOrder />} />
                 <Route path="customers" element={<Customers />} />
+                <Route path="grocery" element={<Grocery />} />
                 <Route path="billing" element={<Billing />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
